@@ -1,62 +1,94 @@
-import junit.framework.TestCase;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.*;
+public class PieceTest {
 
-/*
-  Unit test for Piece class -- starter shell.
- */
-public class PieceTest extends TestCase {
-	// You can create data to be used in the your
-	// test cases like this. For each run of a test method,
-	// a new PieceTest object is created and setUp() is called
-	// automatically by JUnit.
-	// For example, the code below sets up some
-	// pyramid and s pieces in instance variables
-	// that can be used in tests.
-	private Piece pyr1, pyr2, pyr3, pyr4;
-	private Piece s, sRotated;
+	private Piece[] pieces;
+	private Piece square0, square1;
+	private Piece l0, l1, l2, l3, l4;
 
-	protected void setUp() throws Exception {
-		super.setUp();
-		
-		pyr1 = new Piece(Piece.PYRAMID_STR);
-		pyr2 = pyr1.computeNextRotation();
-		pyr3 = pyr2.computeNextRotation();
-		pyr4 = pyr3.computeNextRotation();
-		
-		s = new Piece(Piece.S1_STR);
-		sRotated = s.computeNextRotation();
+	@BeforeEach
+	protected void setUp() {
+		pieces = Piece.getPieces();
+
+		square0 = new Piece(Piece.SQUARE_STR);
+		square1 = square0.computeNextRotation();
+
+		l0 = new Piece(Piece.L1_STR);
+		l1 = l0.computeNextRotation();
+		l2 = l1.computeNextRotation();
+		l3 = l2.computeNextRotation();
+		l4 = l3.computeNextRotation();
+
+		assertThrows(RuntimeException.class, () -> new Piece("a"));
 	}
-	
-	// Here are some sample tests to get you started
-	
-	public void testSampleSize() {
-		// Check size of pyr piece
-		assertEquals(3, pyr1.getWidth());
-		assertEquals(2, pyr1.getHeight());
-		
-		// Now try after rotation
-		// Effectively we're testing size and rotation code here
-		assertEquals(2, pyr2.getWidth());
-		assertEquals(3, pyr2.getHeight());
-		
-		// Now try with some other piece, made a different way
-		Piece l = new Piece(Piece.STICK_STR);
-		assertEquals(1, l.getWidth());
-		assertEquals(4, l.getHeight());
+
+	@Test
+	public void getWidthTest() {
+		assertEquals(2, square0.getWidth());
+		assertEquals(2, square1.getWidth());
+
+		assertEquals(2, l0.getWidth());
+		assertEquals(3, l1.getWidth());
+		assertEquals(2, l2.getWidth());
+		assertEquals(3, l3.getWidth());
+		assertEquals(2, l4.getWidth());
 	}
-	
-	
-	// Test the skirt returned by a few pieces
-	public void testSampleSkirt() {
-		// Note must use assertTrue(Arrays.equals(... as plain .equals does not work
-		// right for arrays.
-		assertTrue(Arrays.equals(new int[] {0, 0, 0}, pyr1.getSkirt()));
-		assertTrue(Arrays.equals(new int[] {1, 0, 1}, pyr3.getSkirt()));
-		
-		assertTrue(Arrays.equals(new int[] {0, 0, 1}, s.getSkirt()));
-		assertTrue(Arrays.equals(new int[] {1, 0}, sRotated.getSkirt()));
+
+	@Test
+	public void getHeightTest() {
+		assertEquals(2, square0.getHeight());
+		assertEquals(2, square1.getHeight());
+
+		assertEquals(3, l0.getHeight());
+		assertEquals(2, l1.getHeight());
+		assertEquals(3, l2.getHeight());
+		assertEquals(2, l3.getHeight());
+		assertEquals(3, l4.getHeight());
 	}
-	
-	
+
+	@Test
+	public void getSkirtTest() {
+		assertArrayEquals(new int[]{0, 0}, square0.getSkirt());
+		assertArrayEquals(new int[]{0, 0}, square1.getSkirt());
+
+		assertArrayEquals(new int[]{0, 0},    l0.getSkirt());
+		assertArrayEquals(new int[]{0, 0, 0}, l1.getSkirt());
+		assertArrayEquals(new int[]{2, 0},    l2.getSkirt());
+		assertArrayEquals(new int[]{0, 1, 1}, l3.getSkirt());
+		assertArrayEquals(new int[]{0, 0},    l4.getSkirt());
+	}
+
+	@Test
+	public void equalsTest() {
+		assertFalse(square0.equals(null));
+		assertFalse(square0.equals(new Piece("")));
+
+		assertTrue(square0.equals(square0));
+		assertTrue(square0.equals(square1));
+
+		assertFalse(l0.equals(null));
+		assertFalse(l0.equals(new Piece("")));
+
+		assertTrue(l0.equals(l0));
+		assertFalse(l0.equals(l1));
+		assertFalse(l0.equals(l2));
+		assertFalse(l0.equals(l3));
+		assertTrue(l0.equals(l4));
+	}
+
+	@Test
+	public void fastRotationTest() {
+		Piece square = pieces[Piece.SQUARE];
+		assertTrue(square0.equals(square));
+		assertTrue(square1.equals(square.fastRotation()));
+
+		Piece l = pieces[Piece.L1];
+		assertTrue(l0.equals(l));
+		assertTrue(l1.equals(l.fastRotation()));
+		assertTrue(l2.equals(l.fastRotation().fastRotation()));
+		assertTrue(l3.equals(l.fastRotation().fastRotation().fastRotation()));
+		assertTrue(l4.equals(l.fastRotation().fastRotation().fastRotation().fastRotation()));
+	}
+
 }
