@@ -24,7 +24,7 @@ public class JBrainTetris extends JTetris {
             return super.pickNextPiece();
         }
 
-        Piece worstPiece = null;
+        Piece worstPiece = pieces[0];
         double worstScore = 0;
         for (int i = 0; i < pieces.length; i++) {
             brainMove = defaultBrain.bestMove(board, pieces[i], board.getHeight(), brainMove);
